@@ -44,17 +44,6 @@ QUEUE* destroyQueue (QUEUE* queue)
 	   } // if
 	return NULL;
 }	// destroyQueue
-//===========================================================
-
-//operator or not===================================
-bool isOperator(int token){
-    if(token=='+'-'0'||token=='-'-'0'||token=='*'-'0'||token=='/'-'0'){
-        return true;
-    }
-    else{
-        return false;
-    }
-}
 
 //enqueue==============================================
 void enqueue(QUEUE* queue,void* dataInPtr){
@@ -71,6 +60,14 @@ void enqueue(QUEUE* queue,void* dataInPtr){
     }
     queue->count++;
 }
+
+int queueCount(QUEUE* queue)
+{
+//	Statements
+	return queue->count;
+}	// queueCount
+
+
 bool dequeue (QUEUE* queue, void** itemPtr)
 {
 //	Local Definitions
@@ -101,160 +98,63 @@ bool emptyQueue (QUEUE* queue)
 }	// emptyQueue
 
 
-//========================================================
+float cal_prefix(QUEUE* queue,char op)
+{
+	float num1, num2;
+	char* dataPtr;
 
-//print queue===========================
-void printQueue(QUEUE* queue){
-    NODE *p = (NODE*)malloc(sizeof(NODE));
-    p = queue->front;
-    while(p!=NULL){
-        if(*(int*)p->dataPtr == '+'-'0') printf("+");
-        else if(*(int*)p->dataPtr == '-'-'0') printf("-");
-        else if(*(int*)p->dataPtr == '*'-'0') printf("*");
-        else if(*(int*)p->dataPtr == '/'-'0') printf("/");
-        else printf("%d",*(int*)p->dataPtr);
+	if(op == '+')
+	{
+		dequeue(queue, &dataPtr);
 
-        if(p->next != NULL) printf(" -> ");
-        p = p->next;
-    }
-    printf("\n");
-    free(p);
-}
-void printQueue2(QUEUE* queue){
-    NODE *p = (NODE*)malloc(sizeof(NODE));
-    p = queue->front;
-    while(p!=NULL){
-        if(*(int*)p->dataPtr == '+'-'0') printf("+");
-        else if(*(int*)p->dataPtr == '-'-'0') printf("-");
-        else if(*(int*)p->dataPtr == '*'-'0') printf("*");
-        else if(*(int*)p->dataPtr == '/'-'0') printf("/");
-        else
-        {
-            if(*(float*)p->dataPtr!=*(int*)p->dataPtr)
-                printf("%f",*(float*)p->dataPtr);
-            else
-                 printf("%d",*(int*)p->dataPtr);
-        }
-        if(p->next != NULL) printf(" -> ");
-        p = p->next;
-    }
-    printf("\n");
-    free(p);
-}
+		num1 =  cal_prefix(queue, *dataPtr);
 
-int calPrefix(QUEUE* queue){
-    //find operator follow by two operand
-    NODE* temp = (NODE*)malloc(sizeof(NODE));
-    NODE* del_1 = (NODE*)malloc(sizeof(NODE));
-    NODE* del_2 = (NODE*)malloc(sizeof(NODE));
-    temp = queue->front;
-    int value=0;
+		dequeue(queue, &dataPtr);
 
-    int operand1,operand2;
-    while(queue->count>=3){
-        if(isOperator(*(int*)temp->dataPtr)){
+		num2 =  cal_prefix(queue, *dataPtr);
 
-            //check if next two character are operand or not
-            if(!isOperator(*(char*)temp->next->dataPtr) && !isOperator(*(char*)temp->next->next->dataPtr)){
-               operand1 = (*(int*)temp->next->dataPtr);
-               operand2 = (*(int*)temp->next->next->dataPtr);
-               //printf("%d\t%d\n",operand1,operand2);
-               if(*(int*)temp->dataPtr == '+'-'0') value = (operand1+operand2);
-               else if(*(int*)temp->dataPtr == '-'-'0') value = (operand1-operand2);
-               else if(*(int*)temp->dataPtr == '*'-'0') value = (operand1*operand2);
-               else if(*(int*)temp->dataPtr == '/'-'0') value = (operand1/operand2);
+		return num1 + num2;
+	}
+	else if(op == '-')
+	{
+		dequeue(queue, &dataPtr);
 
-               //dequeue replace operator with value
-               *(int*)temp->dataPtr = value;
-               del_1 = temp->next;
-               del_2 = del_1->next;
-               temp->next = temp->next->next->next;
-               temp = queue->front;
+		num1 =  cal_prefix(queue, *dataPtr);
 
-               //delete node
-               free(del_1);
-               free(del_2);
-               queue->count -= 2;
-              // printQueue(queue);
-            }
-            else{
-                temp = temp->next;
-            }
-        }
-        else{
-            temp = temp->next;
-        }
-    }
-    return value;
-}
+		dequeue(queue, &dataPtr);
 
-float cal_Prefix(QUEUE* queue){
-    //find operator follow by two operand
-    NODE* temp = (NODE*)malloc(sizeof(NODE));
-    NODE* del_1 = (NODE*)malloc(sizeof(NODE));
-    NODE* del_2 = (NODE*)malloc(sizeof(NODE));
-    temp = queue->front;
+		num2 =  cal_prefix(queue, *dataPtr);
 
-    float value=0.0;
+		return num1 - num2;
+	}
+	else if(op == '*')
+	{
 
-    float operand1,operand2;
-    int op3,op4;
-    while(queue->count>=3){
-        if(isOperator(*(int*)temp->dataPtr)){
+		dequeue(queue, &dataPtr);
 
-            //check if next two character are operand or not
-            if(!isOperator(*(char*)temp->next->dataPtr) && !isOperator(*(char*)temp->next->next->dataPtr)){
-               if((*(float*)temp->next->dataPtr)!=(*(int*)temp->next->dataPtr))
-               {
-                    operand1 = (*(float*)temp->next->dataPtr);
-               }
-               else
-               {
-                   op3 = (*(int*)temp->next->dataPtr);
-               }
-               if(*(float*)temp->next->next->dataPtr!=*(int*)temp->next->next->dataPtr)
-               {
-                   operand2 = (*(float*)temp->next->next->dataPtr);
-               }
-               else
-               {
-                   op4 = (*(int*)temp->next->next->dataPtr);
-               }
+		num1 =  cal_prefix(queue, *dataPtr);
 
-               if(*(int*)temp->dataPtr == '+'-'0') value = (float)(operand1+operand2+8);
-               else if(*(int*)temp->dataPtr == '-'-'0') value = (float)((float)operand1-(float)operand2);
-               else if(*(int*)temp->dataPtr == '*'-'0') value = operand1*operand2;
-               else if(*(int*)temp->dataPtr == '/'-'0') value = (float)((float)operand1/(float)operand2);
+		dequeue(queue, &dataPtr);
 
+		num2 =  cal_prefix(queue, *dataPtr);
 
-               if(value>(int)value||value<(int)value)
-               {
-                   *(float*)temp->dataPtr = value;
-               }
-               else
-               {
-                   *(int*)temp->dataPtr = value;
-               }
+		return num1 * num2;
+	}
+	else if(op == '/')
+	{
 
+		dequeue(queue, &dataPtr);
 
-               del_1 = temp->next;
-               del_2 = del_1->next;
-               temp->next = temp->next->next->next;
-               temp = queue->front;
+		num1 =  cal_prefix(queue, *dataPtr);
 
-               //delete node
-               free(del_1);
-               free(del_2);
-               queue->count -= 2;
-               //printQueue2(queue);
-            }
-            else{
-                temp = temp->next;
-            }
-        }
-        else{
-            temp = temp->next;
-        }
-    }
-    return value;
+		dequeue(queue, &dataPtr);
+
+		num2 =  cal_prefix(queue, *dataPtr);
+
+		return num1 / num2;
+	}
+	else
+	{
+		return  (float)op - 48;
+	}
 }

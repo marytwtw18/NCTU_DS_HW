@@ -3,18 +3,14 @@
 #include<stdbool.h>
 #include"0710880_4_20.h"
 
-
 int main()
 {
     int count = 1;
-    int k=0;
+
+    char *dataPtr;
     char token;
 
-    int result1;
-    float result2;
-
     FILE *fp;
-    char str[40];
 
     fp = fopen("4_20.txt","r");
 
@@ -22,55 +18,41 @@ int main()
     if(!fp)
     {
         printf("error input\n");
-        return 1;
+        exit(1);
     }
 
-     QUEUE *q1 = createQueue();
-     QUEUE *q2 = createQueue();
+    QUEUE *q1 = createQueue();
 
-    for(int i=0;i<2;++i)
+
+    while((token=fgetc(fp))!='\n')
     {
-        int* dataPtr1;
-        int* dataPtr2;
-
-        while((token=fgetc(fp))!='\n')
+        if(token!=' ')
         {
-
-            if(token!=' ')
-            {
-
-
-                if(count==1)
-                {
-                    dataPtr1 = (NODE*)malloc(sizeof(NODE));
-                    *dataPtr1 =token-'0';
-                    //printf("%c ",token);
-                    enqueue(q1, dataPtr1);
-                }
-                else if(count==2)
-                {
-                     dataPtr2 = (NODE*)malloc(sizeof(NODE));
-                    *dataPtr2 =token-'0';
-                    //printf("%c ",token);
-                    enqueue(q2, dataPtr2);
-                }
-            }
-           // if(count==2&&token==' '&&token+1==' ')  break;
+            dataPtr = (char*)malloc(sizeof(char));
+            *dataPtr =token;
+            enqueue(q1, dataPtr);
+            //printf("%c", token);
         }
-        //1by1 case
-        if(count==1)
-        {
-            result1 = calPrefix(q1);
-            printf("case%d: %d\n",count,result1);
-        }
-        else if(count==2)
-        {
-            result2 = cal_Prefix(q2);
-            printf("case%d: %.2f\n",count,result2);
-        }
-        count++;
-
     }
+
+    dequeue(q1,&dataPtr);
+    printf("case%d: %d\n",count,(int)cal_prefix(q1 ,*dataPtr));
+
+    count++;
+
+    while((token=fgetc(fp))!=EOF)
+    {
+         if(token!=' ')
+         {
+            dataPtr = (char*)malloc(sizeof(char));
+            *dataPtr =token;
+            enqueue(q1, dataPtr);
+            //printf("%c", token);
+         }
+    }
+
+    dequeue(q1,&dataPtr);
+    printf("case%d: %.4f\n",count,cal_prefix(q1 ,*dataPtr));
 
     fclose(fp);
     return 0;
