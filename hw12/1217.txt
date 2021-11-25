@@ -1,0 +1,132 @@
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+
+class Heap
+{
+    public:
+        int* heaparr;
+        int size;
+        int last;
+        Heap()
+        {
+            size = 20;
+            last = 0;
+            heaparr = new int[size];
+        }
+        
+};
+void reHeap(Heap* h, int* count);
+void reHeapDown(Heap* h,int last, int* count);
+void InsertHeap(Heap* h, int value, int* count)
+{
+    h->heaparr[h->last] = value;
+    reHeap(h, count);
+    h->last++;
+}
+void sortHeap(Heap* h, int* count)
+{
+    int temp = h->heaparr[0];
+    h->heaparr[0] = h->heaparr[h->last];
+    h->heaparr[h->last] = temp;
+    h->last--;
+    (*count)+=3;
+    reHeapDown(h, h->last, count);
+}
+void reHeapDown(Heap* h,int last, int* count)
+{   
+    int t = 0;
+    while(t*2+1 <= last) //leftchild
+    {
+
+        int leftpoint = t*2+1;
+        if(t*2+2<=last) // rightchild
+        {
+            int rightpoint = t*2+2;
+            if(h->heaparr[leftpoint] > h->heaparr[t])
+            {
+                if(h->heaparr[leftpoint] > h->heaparr[rightpoint])
+                {
+                    int temp = h->heaparr[leftpoint];
+                    h->heaparr[leftpoint] = h->heaparr[t];
+                    h->heaparr[t] = temp;
+                    (*count) += 3;
+                    t = leftpoint;
+                }
+                else
+                {
+                    int temp = h->heaparr[rightpoint];
+                    h->heaparr[rightpoint] = h->heaparr[t];
+                    h->heaparr[t] = temp;
+                    (*count) += 3;
+                    t = rightpoint;
+                }
+                
+            }
+            else if(h->heaparr[rightpoint] > h->heaparr[t])// 
+            {
+                int temp = h->heaparr[rightpoint];
+                h->heaparr[rightpoint] = h->heaparr[t];
+                h->heaparr[t] = temp;
+                (*count) += 3;
+                t = rightpoint;
+            }
+            else
+                break;
+            
+        }           
+        else if(h->heaparr[leftpoint] > h->heaparr[t])
+        {   
+            int temp = h->heaparr[leftpoint];
+            h->heaparr[leftpoint] = h->heaparr[t];
+            h->heaparr[t] = temp;
+            t = leftpoint;
+            (*count)+=3;
+        }
+        else
+            break;
+        
+        
+    }
+}
+void reHeap(Heap* h, int* count)
+{
+    int t = h->last;
+    while((t-1)/2>=0)
+    {
+        if(h->heaparr[t] > h->heaparr[(t-1)/2])
+        {
+            int temp = h->heaparr[t];
+            h->heaparr[t] = h->heaparr[(t-1)/2];
+            h->heaparr[(t-1)/2] = temp;
+            t = (t-1)/2;
+        }
+        else
+            break;
+    }
+        
+}
+int main()
+{
+    string s;
+    Heap h;
+    int count = 0;
+    int a[20] = {47,80,42,37,45,4,52,39,65,32,54,71,82,20,99,55,30,96,2,56};
+    cout << "Unsorted array:\t";
+    for(int i = 0;i < 20;i++)
+    {
+        cout << a[i] << " ";
+        InsertHeap(&h, a[i], &count);
+    }
+    h.last--;
+    cout << endl;
+    cout << "Sorted array:\t";
+    for(int i = 0;i < h.size-1;i++)
+        sortHeap(&h, &count);
+    for(int i = 0;i < h.size;i++)
+        cout << h.heaparr[i]<<" ";    
+    cout << endl;
+    cout << "Total changed:\t"<<count<<endl;
+    
+}
